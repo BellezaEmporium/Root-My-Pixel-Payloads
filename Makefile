@@ -30,8 +30,12 @@ ROOT_HELPER := $(OUTDIR)/cve-2026-43499-root
 # android14-6.1 targets (husky/tegu/lynx/...) compile src/61/* (slide61.c,
 # TCP main route, rounded futex_hash) + the mirrored shared TUs that must
 # live in src/61/ so their #include "common.h" resolves to src/61/common.h.
+#
+# android16-6.12 targets (grizzly, cubs, kodiak, yogi) compile src/612/* (slide612.c, NESTED
+# rt_mutex_waiter, KCFI/PXN-safe data-only route).
 # ---------------------------------------------------------------------------
 sixone-targets := stallion-CP2A.260805.005 raven-CP2A.260705.006 oriole-CP2A.260705.006 bluejay-CP1A.260405.005 bluejay-CP2A.260705.006 shiba-CP2A.260705.006 husky-CP2A.260705.006 tokay-CP2A.260705.006 tokay-AD1A.240905.004 komodo-CP2A.260705.006 tegu-CP2A.260705.006 lynx-CP2A.260705.006 panther-CP2A.260705.006 panther-BP2A.250705.008 cheetah-CP2A.260705.006 comet-CP2A.260705.006 akita-CP2A.260805.005 caiman-CP2A.260705.006 tangorpro-BP1A.250405.007 tangorpro-CP2A.260705.006 felix-CP2A.260605.012
+sixtwelve-targets := grizzly-CD1A.260618.001.C2 cubs-CD1A.260618.001.C2 kodiak-CD1A.260618.001.C2 yogi-CD1A.260618.001.C3
 ifneq ($(filter $(TARGET),$(sixone-targets)),)
 SLIDE_SRC := src/61/slide61.c
 APP_PRELOAD_SRCS := \
@@ -44,6 +48,18 @@ APP_PRELOAD_SRCS := \
   src/61/preload.c
 COMMON_INC := -Isrc/61 -Isrc
 COMMON_DEPS := src/61/common.h src/61/kernelsnitch/*.h
+else ifneq ($(filter $(TARGET),$(sixtwelve-targets)),)
+SLIDE_SRC := src/612/slide612.c
+APP_PRELOAD_SRCS := \
+  src/612/main.c \
+  src/612/util.c \
+  $(SLIDE_SRC) \
+  src/612/fops.c \
+  src/612/pipe.c \
+  src/612/root.c \
+  src/612/preload.c
+COMMON_INC := -Isrc/612 -Isrc
+COMMON_DEPS := src/612/common.h src/612/kernelsnitch/*.h
 else
 SLIDE_SRC := src/slide.c
 APP_PRELOAD_SRCS := \
@@ -99,6 +115,18 @@ clean:
 	rm -rf $(OUTDIR)
 
 # Convenience targets for common Pixel models
+pixel11:
+	$(MAKE) TARGET=cubs-CD1A.260618.001.C2
+
+pixel11pro:
+	$(MAKE) TARGET=grizzly-CD1A.260618.001.C2
+
+pixel11proxl:
+	$(MAKE) TARGET=kodiak-CD1A.260618.001.C2
+
+pixel11profold:
+	$(MAKE) TARGET=yogi-CD1A.260618.001.C3
+
 pixel10a:
 	$(MAKE) TARGET=stallion-CP2A.260805.005
 
