@@ -57,7 +57,7 @@ make pixel6a         # bluejay-CP2A.260705.006 / bluejay-CP1A.260405.005
 make pixel6          # oriole-CP2A.260705.006
 make pixel6pro       # raven-CP2A.260705.006
 make pixelfold       # felix-CP2A.260605.012
-make pixeltablet     # tangorpro-BP1A.250405.007
+make pixeltablet     # tangorpro-BP1A.250405.007 / tangorpro-CP2A.260705.006
 ```
 
 ## Credits
