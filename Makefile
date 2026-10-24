@@ -141,6 +141,7 @@ pixel10:
 
 pixel10proxl:
 	$(MAKE) TARGET=mustang-CP2A.260705.006
+	$(MAKE) TARGET=mustang-BD1A.250702.001
 
 pixel9profold:
 	$(MAKE) TARGET=comet-CP2A.260705.006
