@@ -24,9 +24,9 @@ ls src/targets/
 
 2. **Root daemon** — spawns via `call_usermodehelper`
    - Listens on Unix socket for commands
-   - Launches `ksud late-load` to install ReSukiSU
+   - Launches `ksud late-load` to install BakaSU
 
-3. **KernelSU late-load** — uses vanilla ReSukiSU
+3. **KernelSU late-load** — uses vanilla BakaSU
    - Loads via standard `init_module` syscall
    - Verified via ioctl on `/dev/kernelsu`
 
@@ -46,7 +46,7 @@ make pixel11profold  # yogi-CD1A.260618.001.C3
 make pixel10a        # stallion-CP2A.260805.005
 make pixel10pro      # blazer-CP2A.260705.006
 make pixel10         # frankel-CP2A.260705.006
-make pixel10proxl    # mustang-CP2A.260705.006
+make pixel10proxl    # mustang-CP2A.260705.006 / mustang-BD1A.250702.001
 make pixel10profold  # rango-CP2A.260705.006
 make pixel9profold   # comet-CP2A.260705.006
 make pixel9pro       # caiman-CP2A.260705.006
