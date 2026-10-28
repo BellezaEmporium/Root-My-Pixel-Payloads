@@ -43,8 +43,10 @@
 #define ASHMEM_RELEASE_OFF          0x00c79c0cULL
 #define ASHMEM_SHOW_FDINFO_OFF      0x00c79c98ULL
 
-// ashmem_misc_fops not in kallsyms → using frankel offset
-#define ASHMEM_MISC_FOPS_OFF        0x0228c568ULL
+// kallsyms-finder mangles names: ashmem_fops -> ASHMEM_FOPS, ashmem_misc ->
+// ASHMEM_MISC, compat_ashmem_ioctl -> COMPAT_ASHMEM_IOCTL (verb-first).
+#define ASHMEM_MISC_OFF             0x0223ae98ULL   /* struct miscdevice ashmem_misc (.data) */
+#define ASHMEM_MISC_FOPS_OFF        (ASHMEM_MISC_OFF + 0x10)
 #define ASHMEM_FOPS_OFF             0x012c9eb8ULL   /* const struct file_operations ashmem_fops (.rodata) */
 #define ASHMEM_COMPAT_IOCTL_OFF     0x00c79910ULL   /* compat_ashmem_ioctl */
 #define ASHMEM_LLSEEK_OFF           0x00c790ecULL   /* ashmem_llseek (fops->llseek is NOT noop_llseek on this build) */
